@@ -19,13 +19,14 @@ import {
 import { useCart } from "../../context/CartContext";
 import { useFavorites } from "../../context/FavoritesContext";
 import { useAuth } from "../../context/AuthContext";
+import { useEffect } from "react";
 import i18n from "i18next";
 
 import Logo from "../ui/Logo";
 
 const Header = () => {
   const { t } = useTranslation();
-  const { cartCount } = useCart();
+  const { cartCount, syncCart } = useCart();
   const { favoritesCount } = useFavorites();
   const { user, isAuthenticated, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,6 +34,13 @@ const Header = () => {
   const location = useLocation();
 
   const isRtl = i18n.language === "ar";
+
+  // Sync cart when user logs in
+  useEffect(() => {
+    if (isAuthenticated) {
+      syncCart();
+    }
+  }, [isAuthenticated, syncCart]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -277,10 +285,13 @@ const Header = () => {
               <div className="p-2 bg-gray-100 hover:bg-purple-100 rounded-full transition-colors">
                 <ShoppingBasket size={20} />
               </div>
-              {cartCount > 0 && (
+              {isAuthenticated && cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 rtl:-left-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold animate-bounce">
                   {cartCount > 99 ? "99+" : cartCount}
                 </span>
+              )}
+              {!isAuthenticated && (
+                <span className="absolute -top-1 -right-1 rtl:-left-1 w-3 h-3 bg-gray-400 rounded-full"></span>
               )}
             </Link>
           </div>

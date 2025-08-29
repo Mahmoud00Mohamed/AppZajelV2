@@ -236,6 +236,8 @@
   "cart": {
     "title": "Your Cart",
     "empty": "Your cart is empty",
+    "loginRequired": "Login Required",
+    "loginRequiredMessage": "Please login to view and manage your cart",
     "continueShopping": "Continue Shopping",
     "checkout": "Checkout",
     "total": "Total",

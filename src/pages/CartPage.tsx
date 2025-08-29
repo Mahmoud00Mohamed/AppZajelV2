@@ -14,11 +14,13 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { ProductImage } from "../features/images";
 
 const CartPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
+  const { isAuthenticated } = useAuth();
   const {
     cart,
     removeFromCart,
@@ -26,6 +28,7 @@ const CartPage: React.FC = () => {
     clearCart,
     cartCount,
     cartTotal,
+    isLoading,
   } = useCart();
 
   const [isClearing, setIsClearing] = useState(false);
@@ -42,6 +45,64 @@ const CartPage: React.FC = () => {
   const shippingCost = cartTotal > 200 ? 0 : 25;
   // المجموع النهائي هو المجموع الفرعي (شامل الضريبة) + الشحن
   const finalTotal = cartTotal + shippingCost;
+
+  // Show login prompt if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 flex items-center justify-center p-4 font-serif text-neutral-800">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md border border-white/20 text-center"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <ShoppingCart className="w-8 h-8 text-white" />
+          </motion.div>
+          <h1 className="text-2xl font-bold text-purple-800 mb-4">
+            {isRtl ? "تسجيل الدخول مطلوب" : "Login Required"}
+          </h1>
+          <p className="text-gray-600 mb-8">
+            {isRtl
+              ? "يجب تسجيل الدخول لعرض وإدارة سلة التسوق الخاصة بك"
+              : "Please login to view and manage your shopping cart"}
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link
+              to="/auth/login"
+              className="bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 px-6 rounded-xl font-medium hover:from-purple-700 hover:to-pink-600 transition-all shadow-lg"
+            >
+              {isRtl ? "تسجيل الدخول" : "Login"}
+            </Link>
+            <Link
+              to="/auth/signup"
+              className="bg-white text-purple-600 border border-purple-200 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-all"
+            >
+              {isRtl ? "إنشاء حساب جديد" : "Create Account"}
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">
+            {isRtl ? "جاري تحميل السلة..." : "Loading cart..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -158,6 +219,7 @@ const CartPage: React.FC = () => {
                               updateQuantity(item.id, item.quantity - 1)
                             }
                             className="w-8 h-8 rounded-l-lg hover:bg-gray-200 flex items-center justify-center transition-colors"
+                            disabled={isLoading}
                           >
                             <Minus size={14} />
                           </button>
@@ -169,6 +231,7 @@ const CartPage: React.FC = () => {
                               updateQuantity(item.id, item.quantity + 1)
                             }
                             className="w-8 h-8 rounded-r-lg hover:bg-gray-200 flex items-center justify-center transition-colors"
+                            disabled={isLoading}
                           >
                             <Plus size={14} />
                           </button>
@@ -186,8 +249,13 @@ const CartPage: React.FC = () => {
                         <button
                           onClick={() => removeFromCart(item.id)}
                           className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 flex items-center justify-center transition-colors"
+                          disabled={isLoading}
                         >
-                          <Trash2 size={14} />
+                          {isLoading ? (
+                            <div className="w-3 h-3 border border-red-600 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Trash2 size={14} />
+                          )}
                         </button>
                       </div>
                     </motion.div>

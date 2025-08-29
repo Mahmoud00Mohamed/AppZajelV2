@@ -236,6 +236,8 @@
   "cart": {
     "title": "سلة التسوق",
     "empty": "سلة التسوق فارغة",
+    "loginRequired": "تسجيل الدخول مطلوب",
+    "loginRequiredMessage": "يجب تسجيل الدخول لعرض وإدارة سلة التسوق",
     "continueShopping": "مواصلة التسوق",
     "checkout": "إتمام الشراء",
     "total": "المجموع",
