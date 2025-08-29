@@ -5,7 +5,6 @@ import {
   useState,
   useEffect,
   ReactNode,
-  useCallback,
 } from "react";
 import { useAuth } from "./AuthContext";
 import { useToast } from "./ToastContext";
@@ -28,6 +27,7 @@ interface CartContextType {
   cartCount: number;
   cartTotal: number;
   isLoading: boolean;
+  syncCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -130,9 +130,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         method: "POST",
         headers: getAuthHeaders(),
         credentials: "include",
-        body: JSON.stringify({ 
-          productData: product, 
-          quantity: product.quantity || 1 
+        body: JSON.stringify({
+          productData: product,
+          quantity: product.quantity || 1,
         }),
       });
 
@@ -295,7 +295,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const syncCartWithServer = useCallback(async () => {
+  const syncCartWithServer = async () => {
     if (!isAuthenticated) return;
 
     try {
@@ -323,7 +323,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error syncing cart:", error);
     }
-  }, [isAuthenticated, getAuthHeaders]);
+  };
 
   // Listen for auth events to sync cart
   useEffect(() => {
@@ -337,14 +337,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       setCart([]);
     };
 
-    window.addEventListener('userLoggedIn', handleUserLoggedIn);
-    window.addEventListener('userLoggedOut', handleUserLoggedOut);
+    window.addEventListener("userLoggedIn", handleUserLoggedIn);
+    window.addEventListener("userLoggedOut", handleUserLoggedOut);
 
     return () => {
-      window.removeEventListener('userLoggedIn', handleUserLoggedIn);
-      window.removeEventListener('userLoggedOut', handleUserLoggedOut);
+      window.removeEventListener("userLoggedIn", handleUserLoggedIn);
+      window.removeEventListener("userLoggedOut", handleUserLoggedOut);
     };
-  }, [isAuthenticated, syncCartWithServer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce(
@@ -363,6 +364,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         cartCount,
         cartTotal,
         isLoading,
+        syncCart: syncCartWithServer,
       }}
     >
       {children}
