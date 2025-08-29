@@ -55,7 +55,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } else {
       loadCartFromLocalStorage();
     }
-  }, [isAuthenticated]); // Remove 'user' dependency to prevent infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user]);
 
   const loadCartFromLocalStorage = () => {
     try {
@@ -297,8 +298,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const syncCartWithServer = async () => {
     if (!isAuthenticated) return;
 
-    // Prevent multiple simultaneous sync requests
-    if (isLoading) return;
     try {
       const localCart = localStorage.getItem("zajil-cart");
       const localCartItems = localCart ? JSON.parse(localCart) : [];
@@ -308,7 +307,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      setIsLoading(true);
       const response = await fetch(`${API_BASE_URL}/sync`, {
         method: "POST",
         headers: getAuthHeaders(),
@@ -324,8 +322,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error("Error syncing cart:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -348,6 +344,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       window.removeEventListener("userLoggedIn", handleUserLoggedIn);
       window.removeEventListener("userLoggedOut", handleUserLoggedOut);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
