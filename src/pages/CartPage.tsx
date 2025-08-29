@@ -26,7 +26,6 @@ const CartPage: React.FC = () => {
     clearCart,
     cartCount,
     cartTotal,
-    isLoading,
   } = useCart();
 
   const [isClearing, setIsClearing] = useState(false);
@@ -160,11 +159,7 @@ const CartPage: React.FC = () => {
                             }
                             className="w-8 h-8 rounded-l-lg hover:bg-gray-200 flex items-center justify-center transition-colors"
                           >
-                            {isLoading ? (
-                              <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <Minus size={14} />
-                            )}
+                            <Minus size={14} />
                           </button>
                           <span className="w-10 text-center font-medium bg-white h-8 flex items-center justify-center border-x border-gray-200">
                             {item.quantity}
@@ -175,11 +170,7 @@ const CartPage: React.FC = () => {
                             }
                             className="w-8 h-8 rounded-r-lg hover:bg-gray-200 flex items-center justify-center transition-colors"
                           >
-                            {isLoading ? (
-                              <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <Plus size={14} />
-                            )}
+                            <Plus size={14} />
                           </button>
                         </div>
 
@@ -196,11 +187,7 @@ const CartPage: React.FC = () => {
                           onClick={() => removeFromCart(item.id)}
                           className="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 flex items-center justify-center transition-colors"
                         >
-                          {isLoading ? (
-                            <div className="w-3 h-3 border border-red-400 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Trash2 size={14} />
-                          )}
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </motion.div>
