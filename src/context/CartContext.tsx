@@ -27,7 +27,6 @@ interface CartContextType {
   cartCount: number;
   cartTotal: number;
   isLoading: boolean;
-  syncCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -92,31 +91,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error fetching cart from server:", error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const syncCart = async () => {
-    if (!isAuthenticated) return;
-
-    try {
-      const localCart = localStorage.getItem("zajil-cart");
-      const localCartItems = localCart ? JSON.parse(localCart) : [];
-
-      const response = await fetch(`${API_BASE_URL}/sync`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        credentials: "include",
-        body: JSON.stringify({ localCartItems }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCart(data.cart.items || []);
-        localStorage.removeItem("zajil-cart"); // Clear local storage after sync
-        console.log("تم مزامنة السلة بنجاح");
-      }
-    } catch (error) {
-      console.error("Error syncing cart:", error);
     }
   };
 
@@ -369,7 +343,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       window.removeEventListener('userLoggedIn', handleUserLoggedIn);
       window.removeEventListener('userLoggedOut', handleUserLoggedOut);
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, syncCartWithServer]);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce(
@@ -388,7 +362,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         cartCount,
         cartTotal,
         isLoading,
-        syncCart: syncCartWithServer,
       }}
     >
       {children}
