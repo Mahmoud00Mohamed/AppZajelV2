@@ -1,0 +1,41 @@
+[
+  {
+    "id": 101,
+    "nameEn": "Red Rose Bouquet",
+    "nameAr": "باقة ورد أحمر",
+    "price": 199,
+    "imageUrl": "https://images.pexels.com/photos/4466492/pexels-photo-4466492.jpeg",
+    "isBestSeller": true,
+    "isSpecialGift": false,
+    "categoryId": "flowers",
+    "occasionId": "valentines-day",
+    "descriptionEn": "A classic bouquet of vibrant red roses, symbolizing love and affection. Each rose is carefully selected for its beauty and freshness, arranged with elegant greenery and wrapped in premium paper. Perfect for expressing your deepest emotions on special occasions.",
+    "descriptionAr": "باقة كلاسيكية من الورود الحمراء النابضة بالحياة، ترمز إلى الحب والعاطفة. كل وردة مختارة بعناية لجمالها ونضارتها، مرتبة مع خضرة أنيقة ومغلفة بورق مميز. مثالية للتعبير عن أعمق مشاعرك في المناسبات الخاصة."
+  },
+  {
+    "id": 102,
+    "nameEn": "White Lily Arrangement",
+    "nameAr": "تنسيق زنابق بيضاء",
+    "price": 249,
+    "imageUrl": "https://images.pexels.com/photos/931162/pexels-photo-931162.jpeg",
+    "isBestSeller": false,
+    "isSpecialGift": true,
+    "categoryId": "flowers",
+    "occasionId": "wedding",
+    "descriptionEn": "Elegant white lilies arranged beautifully for special occasions. These pristine flowers represent purity and new beginnings, making them perfect for weddings and celebrations. The arrangement includes complementary foliage and is presented in a sophisticated style.",
+    "descriptionAr": "زنابق بيضاء أنيقة مرتبة بجمال للمناسبات الخاصة. هذه الزهور النقية تمثل الطهارة والبدايات الجديدة، مما يجعلها مثالية لحفلات الزفاف والاحتفالات. التنسيق يشمل أوراق مكملة ومقدم بأسلوب راقي."
+  },
+  {
+    "id": 103,
+    "nameEn": "Mixed Seasonal Flowers",
+    "nameAr": "زهور موسمية متنوعة",
+    "price": 179,
+    "imageUrl": "https://images.pexels.com/photos/132474/pexels-photo-132474.jpeg",
+    "isBestSeller": false,
+    "isSpecialGift": false,
+    "categoryId": "flowers",
+    "occasionId": "thank-you",
+    "descriptionEn": "A beautiful mix of seasonal flowers in vibrant colors. This cheerful arrangement features the best blooms of the season, carefully combined to create a stunning display. Each bouquet is unique and brings the beauty of nature into any space.",
+    "descriptionAr": "مزيج جميل من الزهور الموسمية بألوان نابضة بالحياة. هذا التنسيق المبهج يضم أفضل أزهار الموسم، مجمعة بعناية لخلق عرض مذهل. كل باقة فريدة وتجلب جمال الطبيعة إلى أي مكان."
+  }
+]

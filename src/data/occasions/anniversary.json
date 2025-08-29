@@ -1,0 +1,41 @@
+[
+  {
+    "id": 2401,
+    "nameEn": "Anniversary Romance Package",
+    "nameAr": "باقة رومانسية ذكرى سنوية",
+    "price": 499,
+    "imageUrl": "https://images.pexels.com/photos/3171837/pexels-photo-3171837.jpeg",
+    "isBestSeller": true,
+    "isSpecialGift": true,
+    "categoryId": "jewelry",
+    "occasionId": "anniversary",
+    "descriptionEn": "A romantic package with jewelry and flowers for your special anniversary.",
+    "descriptionAr": "باقة رومانسية تحتوي على مجوهرات وزهور لذكراكم السنوية الخاصة."
+  },
+  {
+    "id": 2402,
+    "nameEn": "Anniversary Red Roses",
+    "nameAr": "ورود حمراء ذكرى سنوية",
+    "price": 249,
+    "imageUrl": "https://images.pexels.com/photos/4466492/pexels-photo-4466492.jpeg",
+    "isBestSeller": false,
+    "isSpecialGift": false,
+    "categoryId": "flowers",
+    "occasionId": "anniversary",
+    "descriptionEn": "Classic red roses to express your enduring love on your anniversary.",
+    "descriptionAr": "ورود حمراء كلاسيكية للتعبير عن حبكم الدائم في ذكراكم السنوية."
+  },
+  {
+    "id": 2403,
+    "nameEn": "Anniversary Spa Voucher",
+    "nameAr": "قسيمة سبا ذكرى سنوية",
+    "price": 399,
+    "imageUrl": "https://images.pexels.com/photos/7957747/pexels-photo-7957747.jpeg",
+    "isBestSeller": false,
+    "isSpecialGift": true,
+    "categoryId": "coupons",
+    "occasionId": "anniversary",
+    "descriptionEn": "A relaxing spa voucher for couples to enjoy together on their anniversary.",
+    "descriptionAr": "قسيمة سبا مريحة للأزواج للاستمتاع بها معاً في ذكراهم السنوية."
+  }
+]
