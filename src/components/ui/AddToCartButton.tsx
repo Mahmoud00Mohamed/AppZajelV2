@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart, Check } from "lucide-react";
+import { User } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useToast } from "../../context/ToastContext";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 
 interface AddToCartButtonProps {
   product: {
@@ -31,6 +34,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   const { addToCart } = useCart();
   const { showSuccess } = useToast();
   const { t, i18n } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const isRtl = i18n.language === "ar";
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
@@ -51,12 +55,17 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      return; // The button will show login prompt instead
+    }
+
     if (isAdding || justAdded) return;
 
     setIsAdding(true);
 
     try {
-      addToCart({
+      await addToCart({
         id: product.id,
         nameEn: product.nameEn,
         nameAr: product.nameAr,
@@ -67,16 +76,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
       setJustAdded(true);
 
-      // تم حذف كائن الـ action من هنا
-      showSuccess(
-        isRtl ? "تم الإضافة للسلة" : "Added to Cart",
-        isRtl
-          ? `تم إضافة ${product.nameAr} إلى عربة التسوق`
-          : `${product.nameEn} added to cart`,
-        undefined, // <- تم حذف الزر
-        "cart-success"
-      );
-
       setTimeout(() => {
         setJustAdded(false);
         setIsAdding(false);
@@ -84,13 +83,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     } catch (error) {
       console.error("خطأ في إضافة المنتج إلى عربة التسوق:", error);
       setIsAdding(false);
-
-      if (showSuccess) {
-        showSuccess(
-          isRtl ? "خطأ" : "Error",
-          isRtl ? "حدث خطأ أثناء إضافة المنتج" : "Error adding product to cart"
-        );
-      }
     }
   };
 
@@ -134,6 +126,34 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       </div>
     );
   };
+
+  // Show login prompt for non-authenticated users
+  if (!isAuthenticated) {
+    return (
+      <Link
+        to="/auth/login"
+        className={`
+          flex items-center justify-center font-medium rounded-xl transition-all duration-300
+          ${sizeClasses[size]}
+          bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200
+          ${className}
+        `}
+        onClick={(e) => e.stopPropagation()}
+        aria-label={
+          isRtl
+            ? "تسجيل الدخول لإضافة المنتج"
+            : "Login to add product"
+        }
+      >
+        <div className="flex items-center gap-2">
+          <User size={variant === "icon" ? 18 : 16} />
+          {showLabel && variant !== "icon" && (
+            <span>{isRtl ? "تسجيل الدخول" : "Login to Add"}</span>
+          )}
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <motion.button

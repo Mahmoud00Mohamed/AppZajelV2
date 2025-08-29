@@ -13,6 +13,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import favoritesRoutes from "./routes/favoritesRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 import passport from "./config/passport.js";
 import { printServiceStatus } from "./utils/serviceChecker.js";
 
@@ -103,6 +104,7 @@ app.use(passport.session());
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/favorites", favoritesRoutes);
+app.use("/api/cart", cartRoutes);
 
 // ✅ إنشاء السيرفر باستخدام HTTPS
 const server = https.createServer(sslOptions, app);

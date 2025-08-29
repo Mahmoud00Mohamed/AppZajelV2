@@ -112,6 +112,9 @@ const BottomNavigation: React.FC = () => {
                       {item.badge > 9 ? "9+" : item.badge}
                     </span>
                   )}
+                {item.id === "home" && location.pathname === "/cart" && !isAuthenticated && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+                )}
               </motion.div>
 
               <span

@@ -81,9 +81,9 @@ function App() {
   return (
     <ToastProvider>
       <AuthProvider>
-        <UserProvider>
-          <FavoritesProvider>
-            <CartProvider>
+        <CartProvider>
+          <UserProvider>
+            <FavoritesProvider>
               <div
                 className={`min-h-screen flex flex-col ${
                   i18n.language === "ar" ? "font-sans-ar" : "font-sans-en"
@@ -108,7 +108,10 @@ function App() {
                       />
                       <Route path="/product/:id" element={<ProductPage />} />
                       <Route path="/products" element={<ProductsPage />} />
-                      <Route path="/cart" element={<CartPage />} />
+                      <Route 
+                        path="/cart" 
+                        element={<CartPage />} 
+                      />
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/contact" element={<ContactPage />} />
                       <Route path="/faq" element={<FAQPage />} />
@@ -236,9 +239,9 @@ function App() {
                 <Footer />
                 <BottomNavigation />
               </div>
-            </CartProvider>
-          </FavoritesProvider>
-        </UserProvider>
+            </FavoritesProvider>
+          </UserProvider>
+        </CartProvider>
       </AuthProvider>
     </ToastProvider>
   );

@@ -1,4 +1,3 @@
-// src/context/CartContext.tsx
 import {
   createContext,
   useContext,
@@ -6,6 +5,8 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import { useAuth } from "./AuthContext";
+import { useToast } from "./ToastContext";
 
 interface CartItem {
   id: number;
@@ -14,112 +15,271 @@ interface CartItem {
   price: number;
   imageUrl: string;
   quantity: number;
+  addedAt?: string;
 }
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: CartItem) => void;
-  removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
-  clearCart: () => void;
+  addToCart: (product: CartItem) => Promise<void>;
+  removeFromCart: (id: number) => Promise<void>;
+  updateQuantity: (id: number, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
   cartCount: number;
   cartTotal: number;
+  isLoading: boolean;
+  syncCart: () => Promise<void>;
+  refreshCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const API_BASE_URL = "https://localhost:3002/api/cart";
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated, user } = useAuth();
+  const { showSuccess, showError } = useToast();
 
-  // Load cart from localStorage on mount
-  useEffect(() => {
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("accessToken");
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+  };
+
+  // Load cart from localStorage for non-authenticated users
+  const loadLocalCart = () => {
     try {
       const savedCart = localStorage.getItem("zajil-cart");
       if (savedCart) {
         const parsedCart = JSON.parse(savedCart);
         setCart(parsedCart);
-        console.log("تم تحميل السلة من التخزين المحلي:", parsedCart);
       }
     } catch (error) {
       console.error("خطأ في تحميل السلة من التخزين المحلي:", error);
     }
-  }, []);
+  };
 
-  // Save cart to localStorage whenever cart changes
-  useEffect(() => {
+  // Save cart to localStorage for non-authenticated users
+  const saveLocalCart = (cartData: CartItem[]) => {
     try {
-      localStorage.setItem("zajil-cart", JSON.stringify(cart));
-      console.log("تم حفظ السلة في التخزين المحلي:", cart);
+      localStorage.setItem("zajil-cart", JSON.stringify(cartData));
     } catch (error) {
       console.error("خطأ في حفظ السلة في التخزين المحلي:", error);
     }
-  }, [cart]);
-
-  const addToCart = (product: CartItem) => {
-    try {
-      setCart((prev) => {
-        const existingItem = prev.find((item) => item.id === product.id);
-
-        if (existingItem) {
-          // Update quantity if item already exists
-          const updatedCart = prev.map((item) =>
-            item.id === product.id
-              ? { ...item, quantity: item.quantity + (product.quantity || 1) }
-              : item
-          );
-          console.log(`تم تحديث كمية المنتج ${product.id} في السلة`);
-          return updatedCart;
-        } else {
-          // Add new item to cart
-          const newItem = { ...product, quantity: product.quantity || 1 };
-          const updatedCart = [...prev, newItem];
-          console.log(`تم إضافة المنتج ${product.id} إلى السلة بنجاح`);
-          return updatedCart;
-        }
-      });
-    } catch (error) {
-      console.error("خطأ في إضافة المنتج إلى عربة التسوق:", error);
-      throw error;
-    }
   };
 
-  const removeFromCart = (id: number) => {
-    try {
-      setCart((prev) => {
-        const updatedCart = prev.filter((item) => item.id !== id);
-        console.log(`تم حذف المنتج ${id} من عربة التسوق`);
-        return updatedCart;
-      });
-    } catch (error) {
-      console.error("خطأ في حذف المنتج من عربة التسوق:", error);
+  // Load cart from server for authenticated users
+  const refreshCart = async () => {
+    if (!isAuthenticated) {
+      loadLocalCart();
+      return;
     }
-  };
 
-  const updateQuantity = (id: number, quantity: number) => {
+    setIsLoading(true);
     try {
-      if (quantity <= 0) {
-        removeFromCart(id);
-        return;
+      const response = await fetch(`${API_BASE_URL}`, {
+        headers: getAuthHeaders(),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCart(data.cart.items || []);
+        // Clear local storage when using server cart
+        localStorage.removeItem("zajil-cart");
+      } else {
+        console.error("Failed to fetch cart");
+        loadLocalCart(); // Fallback to local cart
       }
-
-      setCart((prev) => {
-        const updatedCart = prev.map((item) =>
-          item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
-        );
-        console.log(`تم تحديث كمية المنتج ${id} إلى ${quantity}`);
-        return updatedCart;
-      });
     } catch (error) {
-      console.error("خطأ في تحديث كمية المنتج:", error);
+      console.error("Error fetching cart:", error);
+      loadLocalCart(); // Fallback to local cart
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const clearCart = () => {
+  // Sync local cart with server when user logs in
+  const syncCart = async () => {
+    if (!isAuthenticated) return;
+
     try {
-      setCart([]);
-      console.log("تم مسح عربة التسوق");
+      const localCart = localStorage.getItem("zajil-cart");
+      if (localCart) {
+        const localCartItems = JSON.parse(localCart);
+        
+        if (localCartItems.length > 0) {
+          const response = await fetch(`${API_BASE_URL}/sync`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            credentials: "include",
+            body: JSON.stringify({ localCartItems }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setCart(data.cart.items || []);
+            localStorage.removeItem("zajil-cart");
+            showSuccess(
+              "تم دمج السلة",
+              "تم دمج عناصر السلة المحلية مع حسابك بنجاح"
+            );
+          }
+        }
+      }
+      
+      // Refresh cart from server
+      await refreshCart();
     } catch (error) {
-      console.error("خطأ في مسح عربة التسوق:", error);
+      console.error("Error syncing cart:", error);
+    }
+  };
+
+  // Load cart when authentication status changes
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      syncCart();
+    } else {
+      loadLocalCart();
+    }
+  }, [isAuthenticated, user]);
+
+  const addToCart = async (product: CartItem) => {
+    if (!isAuthenticated) {
+      showError(
+        "تسجيل الدخول مطلوب",
+        "يجب تسجيل الدخول لإضافة المنتجات إلى السلة"
+      );
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/add`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        credentials: "include",
+        body: JSON.stringify({ productData: product }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCart(data.cart.items || []);
+        showSuccess(
+          "تم الإضافة للسلة",
+          `تم إضافة ${product.nameAr} إلى السلة بنجاح`
+        );
+      } else {
+        throw new Error(data.message || "فشل في إضافة المنتج");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      showError("خطأ", (error as Error).message);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const removeFromCart = async (id: number) => {
+    if (!isAuthenticated) {
+      showError("تسجيل الدخول مطلوب", "يجب تسجيل الدخول لإدارة السلة");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/remove/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCart(data.cart.items || []);
+        showSuccess("تم الحذف", "تم حذف المنتج من السلة");
+      } else {
+        throw new Error(data.message || "فشل في حذف المنتج");
+      }
+    } catch (error) {
+      console.error("Error removing from cart:", error);
+      showError("خطأ", (error as Error).message);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateQuantity = async (id: number, quantity: number) => {
+    if (!isAuthenticated) {
+      showError("تسجيل الدخول مطلوب", "يجب تسجيل الدخول لإدارة السلة");
+      return;
+    }
+
+    if (quantity <= 0) {
+      await removeFromCart(id);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/update/${id}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        credentials: "include",
+        body: JSON.stringify({ quantity }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCart(data.cart.items || []);
+      } else {
+        throw new Error(data.message || "فشل في تحديث الكمية");
+      }
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      showError("خطأ", (error as Error).message);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearCart = async () => {
+    if (!isAuthenticated) {
+      showError("تسجيل الدخول مطلوب", "يجب تسجيل الدخول لإدارة السلة");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/clear`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCart([]);
+        showSuccess("تم المسح", "تم مسح جميع عناصر السلة");
+      } else {
+        throw new Error(data.message || "فشل في مسح السلة");
+      }
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      showError("خطأ", (error as Error).message);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -139,6 +299,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         cartCount,
         cartTotal,
+        isLoading,
+        syncCart,
+        refreshCart,
       }}
     >
       {children}
@@ -146,7 +309,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {

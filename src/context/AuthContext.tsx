@@ -52,7 +52,6 @@ const API_BASE_URL = "https://localhost:3002/api/auth";
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { showSuccess, showError } = useToast();
 
   const isAuthenticated = !!user;
 
@@ -166,7 +165,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       showSuccess("تم تسجيل الخروج بنجاح", "نراك قريباً!");
     }
   };
-
   const verifyEmail = async (email: string, verificationCode: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/verify-email`, {
