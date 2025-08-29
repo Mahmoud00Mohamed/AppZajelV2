@@ -281,11 +281,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   // Load profile when user is authenticated
   React.useEffect(() => {
-    if (isAuthenticated && user && !profile) {
+    if (isAuthenticated && user?.id && !profile) {
       refreshProfile();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user?.id, profile]); // Add profile to dependencies and use user.id
 
   return (
     <UserContext.Provider

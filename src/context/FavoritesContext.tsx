@@ -53,14 +53,13 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
 
   // Load favorites from server when user is authenticated
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user?.id) {
       refreshFavorites();
     } else {
       // Clear favorites when user logs out
       setFavorites([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user?.id]); // Use user.id instead of entire user object
 
   const refreshFavorites = async () => {
     if (!isAuthenticated) return;

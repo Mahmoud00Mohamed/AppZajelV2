@@ -297,6 +297,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const syncCartWithServer = async () => {
     if (!isAuthenticated) return;
 
+    // Prevent multiple simultaneous sync requests
+    if (isLoading) return;
     try {
       const localCart = localStorage.getItem("zajil-cart");
       const localCartItems = localCart ? JSON.parse(localCart) : [];
@@ -306,6 +308,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
+      setIsLoading(true);
       const response = await fetch(`${API_BASE_URL}/sync`, {
         method: "POST",
         headers: getAuthHeaders(),
@@ -321,6 +324,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error("Error syncing cart:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
