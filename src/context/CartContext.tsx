@@ -55,8 +55,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } else {
       loadCartFromLocalStorage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated]); // Remove 'user' dependency to prevent infinite loop
 
   const loadCartFromLocalStorage = () => {
     try {
@@ -344,7 +343,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       window.removeEventListener("userLoggedIn", handleUserLoggedIn);
       window.removeEventListener("userLoggedOut", handleUserLoggedOut);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
