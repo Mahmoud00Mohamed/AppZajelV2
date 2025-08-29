@@ -5,6 +5,7 @@ import {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import { useAuth } from "./AuthContext";
 import { useToast } from "./ToastContext";
@@ -294,7 +295,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const syncCartWithServer = async () => {
+  const syncCartWithServer = useCallback(async () => {
     if (!isAuthenticated) return;
 
     try {
@@ -322,7 +323,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error syncing cart:", error);
     }
-  };
+  }, [isAuthenticated, getAuthHeaders]);
 
   // Listen for auth events to sync cart
   useEffect(() => {
