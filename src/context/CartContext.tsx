@@ -62,15 +62,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Save cart to localStorage for non-authenticated users
-  const saveLocalCart = (cartData: CartItem[]) => {
-    try {
-      localStorage.setItem("zajil-cart", JSON.stringify(cartData));
-    } catch (error) {
-      console.error("خطأ في حفظ السلة في التخزين المحلي:", error);
-    }
-  };
-
   // Load cart from server for authenticated users
   const refreshCart = async () => {
     if (!isAuthenticated) {
@@ -145,7 +136,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } else {
       loadLocalCart();
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, syncCart]);
 
   const addToCart = async (product: CartItem) => {
     if (!isAuthenticated) {
@@ -309,6 +300,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {

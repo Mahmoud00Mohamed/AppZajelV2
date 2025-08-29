@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { ShoppingCart, Check } from "lucide-react";
 import { User } from "lucide-react";
 import { useCart } from "../../context/CartContext";
-import { useToast } from "../../context/ToastContext";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
@@ -32,7 +31,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   quantity = 1,
 }) => {
   const { addToCart } = useCart();
-  const { showSuccess } = useToast();
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuth();
   const isRtl = i18n.language === "ar";

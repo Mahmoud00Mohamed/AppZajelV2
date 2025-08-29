@@ -26,6 +26,7 @@ const CartPage: React.FC = () => {
     clearCart,
     cartCount,
     cartTotal,
+    isLoading,
   } = useCart();
 
   const [isClearing, setIsClearing] = useState(false);

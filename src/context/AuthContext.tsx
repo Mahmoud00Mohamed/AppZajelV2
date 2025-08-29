@@ -5,7 +5,6 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { useToast } from "./ToastContext";
 
 interface User {
   id: string;
@@ -112,12 +111,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.ok) {
         localStorage.setItem("accessToken", data.accessToken);
         await checkAuthStatus();
-        showSuccess("تم تسجيل الدخول بنجاح", "مرحباً بك مرة أخرى!");
       } else {
         throw new Error(data.message || "فشل في تسجيل الدخول");
       }
     } catch (error) {
-      showError("خطأ في تسجيل الدخول", (error as Error).message);
       throw error;
     }
   };
@@ -141,12 +138,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
 
       if (response.ok) {
-        showSuccess("تم إنشاء الحساب بنجاح", data.message);
       } else {
         throw new Error(data.message || "فشل في إنشاء الحساب");
       }
     } catch (error) {
-      showError("خطأ في إنشاء الحساب", (error as Error).message);
       throw error;
     }
   };
@@ -162,7 +157,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       localStorage.removeItem("accessToken");
       setUser(null);
-      showSuccess("تم تسجيل الخروج بنجاح", "نراك قريباً!");
     }
   };
   const verifyEmail = async (email: string, verificationCode: string) => {
@@ -181,12 +175,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.ok) {
         localStorage.setItem("accessToken", data.accessToken);
         await checkAuthStatus();
-        showSuccess("تم التحقق من البريد الإلكتروني", data.message);
       } else {
         throw new Error(data.message || "فشل في التحقق من البريد الإلكتروني");
       }
     } catch (error) {
-      showError("خطأ في التحقق", (error as Error).message);
       throw error;
     }
   };
@@ -207,12 +199,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
 
       if (response.ok) {
-        showSuccess("تم إرسال رابط إعادة التعيين", data.message);
       } else {
         throw new Error(data.message || "فشل في إرسال رابط إعادة التعيين");
       }
     } catch (error) {
-      showError("خطأ في إعادة تعيين كلمة المرور", (error as Error).message);
       throw error;
     }
   };
@@ -230,12 +220,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
 
       if (response.ok) {
-        showSuccess("تم تغيير كلمة المرور بنجاح", data.message);
       } else {
         throw new Error(data.message || "فشل في تغيير كلمة المرور");
       }
     } catch (error) {
-      showError("خطأ في تغيير كلمة المرور", (error as Error).message);
       throw error;
     }
   };
@@ -253,12 +241,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
 
       if (response.ok) {
-        showSuccess("تم إعادة إرسال الرمز", data.message);
       } else {
         throw new Error(data.message || "فشل في إعادة إرسال الرمز");
       }
     } catch (error) {
-      showError("خطأ في إعادة الإرسال", (error as Error).message);
       throw error;
     }
   };
@@ -302,12 +288,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
 
       if (response.ok) {
-        showSuccess("تم إرسال رمز التحقق", data.message);
       } else {
         throw new Error(data.message || "فشل في إرسال رمز التحقق");
       }
     } catch (error) {
-      showError("خطأ في إرسال رمز التحقق", (error as Error).message);
       throw error;
     }
   };
@@ -329,12 +313,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (response.ok) {
         await checkAuthStatus();
-        showSuccess("تم التحقق من رقم الهاتف", data.message);
       } else {
         throw new Error(data.message || "فشل في التحقق من رقم الهاتف");
       }
     } catch (error) {
-      showError("خطأ في التحقق من الهاتف", (error as Error).message);
       throw error;
     }
   };
@@ -352,12 +334,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
 
       if (response.ok) {
-        showSuccess("تم إرسال رمز التحقق", data.message);
       } else {
         throw new Error(data.message || "فشل في إرسال رمز التحقق");
       }
     } catch (error) {
-      showError("خطأ في تسجيل الدخول بالهاتف", (error as Error).message);
       throw error;
     }
   };
@@ -378,12 +358,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.ok) {
         localStorage.setItem("accessToken", data.accessToken);
         await checkAuthStatus();
-        showSuccess("تم تسجيل الدخول بنجاح", data.message);
       } else {
         throw new Error(data.message || "فشل في تسجيل الدخول");
       }
     } catch (error) {
-      showError("خطأ في التحقق من الهاتف", (error as Error).message);
       throw error;
     }
   };
